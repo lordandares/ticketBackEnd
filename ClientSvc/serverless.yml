@@ -11,6 +11,7 @@ plugins:
 provider:
   name: aws
   runtime: nodejs10.x
+                                                                                                                                                                          
 
 functions:
   createClient:
@@ -20,3 +21,21 @@ functions:
       - http:
           path: "/clients"
           method: "POST"
+
+
+resources:
+  Resources:
+    ClientTable:
+      Type: 'AWS::DynamoDB::Table'
+      DeletionPolicy: Retain
+      Properties:
+        TableName: 'ClientTable'
+        AttributeDefinitions:
+          - AttributeName: GroupId
+            AttributeType: S
+        KeySchema:
+          - AttributeName: GroupId
+            KeyType: HASH
+        ProvisionedThroughput:
+          ReadCapacityUnits: 1
+          WriteCapacityUnits: 1

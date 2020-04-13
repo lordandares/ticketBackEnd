@@ -1,11 +1,3 @@
-export interface Client {
-    GroupId: string
-    ClientId: string
-    Name: string
-    Phone: string
-    Address: Address
-
-  }
 
 export interface CreateClientRequest {
     ClientId: string
