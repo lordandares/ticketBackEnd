@@ -7,7 +7,7 @@ import DynamoDB = require('aws-sdk/clients/dynamodb');
 
 const createClient = async (obj: Client): Promise<Client> => {
   
-  const dynamo = new DynamoDB({region: 'us-west-2'});
+  const dynamo = new DynamoDB({region: 'us-east-1'});
   const mapper = new DataMapper({client: dynamo});  
   const result = await mapper.put({item: obj});
   return result.item;
