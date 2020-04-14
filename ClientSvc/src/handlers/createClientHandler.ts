@@ -1,63 +1,48 @@
-import { APIGatewayProxyHandler, APIGatewayProxyResult, APIGatewayProxyEvent } from 'aws-lambda'
+import { APIGatewayProxyResult, APIGatewayProxyEvent } from 'aws-lambda'
 import { Client } from '../classes/client'
-import { ClientServices } from '../services/ClientServices'
 
-interface clientPayload  {
-  Phone: string
-  ClientId: string
-  Name: string
-};
+export async function createClientHandler(
+  event: APIGatewayProxyEvent,
+): Promise<APIGatewayProxyResult> {
 
-  export async function createClientHandler(
-    event: APIGatewayProxyEvent,
-  ): Promise<APIGatewayProxyResult> {
+  const { body: eventBody, headers } = event
+  const result: APIGatewayProxyResult = {
+    body: JSON.stringify(event),
+    statusCode: 400,
 
-      const { body: eventBody, headers } = event
-      const result : APIGatewayProxyResult = {
-        body: JSON.stringify(event),
-        statusCode: 400,
+  }
 
-      }
-      console.log('event', event)
-
-
-      if (!eventBody) {
-        return result
-      }
-
-      console.log(headers)
-      console.log(eventBody)
+  if (!eventBody) {
+    result.body = 'empty body'
+    return result
+  }
 
   try {
-    const data : clientPayload = JSON.parse(eventBody)
+    const client = new Client()
+    Object.assign(client, JSON.parse(eventBody));
 
-    if (data && data.Phone && data.ClientId && data.Name){
-     
-      const clientObject = new Client()
-      clientObject.GroupId = data.ClientId.slice(-1) 
-      clientObject.ClientId = data.ClientId
-      clientObject.Name = data.Name
-      clientObject.Phone = data.Phone
 
-      console.log('client',JSON.stringify(clientObject))
+    if (client && client.Phone && client.ClientId && client.Name) {
 
-      const client : Client = await ClientServices.createClient(clientObject)
+      const clientData: Client = await client.createClient()
 
-      console.log('3------------------>')
-      console.log(JSON.stringify(client))
-
-      result.body = JSON.stringify(client)
+      result.body = JSON.stringify(clientData)
       result.statusCode = 200
-    
+
     }
-    
+    return result
+
   } catch (err) {
+    result.body = JSON.stringify(err)
+    result.statusCode = 500
+
     console.log('create Error', {
       err,
       event,
     })
+    return result
 
   }
-  return result
+
 }
 
